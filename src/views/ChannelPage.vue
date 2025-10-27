@@ -62,6 +62,10 @@ const goToNextPage = () => {
     }
 }
 
+const goToHome = () => {
+    router.push('/')
+}
+
 // 处理页面大小变化
 const handlePageSizeChange = (newSize: number) => {
     pageSize.value = newSize
@@ -90,6 +94,7 @@ onMounted(() => {
 
         <div v-else-if="channelInfo" class="channel-content">
             <header class="header">
+                <button @click="goToHome" class="back-btn">← 返回主页</button>
                 <h1>{{ channelInfo.name }}</h1>
                 <p class="description">{{ channelInfo.description }}</p>
                 <div class="stats">
@@ -173,6 +178,25 @@ onMounted(() => {
 .header {
     text-align: center;
     margin-bottom: 3rem;
+    position: relative;
+}
+
+.back-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0.5rem 1rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.back-btn:hover {
+    background-color: #5a6268;
 }
 
 .header h1 {
