@@ -11,6 +11,7 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const currentPage = ref(1)
 const pageSize = ref(12) // 每页显示12个铺面
+const pageSizeOptions = [6, 12, 24, 48] // 可选的每页显示数量
 
 const channel = computed(() => route.params.channel as string)
 
@@ -23,9 +24,8 @@ const totalPages = computed(() => {
 // 获取当前页的铺面
 const currentCharts = computed(() => {
     if (!channelInfo.value) return []
-    const startIndex = (currentPage.value - 1) * pageSize.value
-    const endIndex = startIndex + pageSize.value
-    return channelInfo.value.charts.slice(startIndex, endIndex)
+
+    return channelInfo.value.charts
 })
 
 const fetchChannelInfo = async () => {
@@ -62,8 +62,14 @@ const goToNextPage = () => {
     }
 }
 
-// 监听页码变化重新获取数据
-watch([currentPage, channel], () => {
+// 处理页面大小变化
+const handlePageSizeChange = (newSize: number) => {
+    pageSize.value = newSize
+    currentPage.value = 1 // 重置到第一页
+}
+
+// 监听页码和页面大小变化重新获取数据
+watch([currentPage, pageSize, channel], () => {
     fetchChannelInfo()
 })
 
@@ -108,7 +114,15 @@ onMounted(() => {
                 </div>
 
                 <!-- 分页控件 -->
-                <div v-if="totalPages > 1" class="pagination">
+                <div class="pagination">
+                    <div class="page-size-selector">
+                        <label for="pageSize">每页显示:</label>
+                        <select id="pageSize" v-model="pageSize" @change="handlePageSizeChange(Number(pageSize))"
+                            class="page-size-select">
+                            <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
+                        </select>
+                    </div>
+
                     <button @click="goToPreviousPage" :disabled="currentPage === 1" class="page-btn">
                         上一页
                     </button>
@@ -249,6 +263,27 @@ onMounted(() => {
     align-items: center;
     gap: 1rem;
     margin-top: 2rem;
+}
+
+.page-size-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.page-size-select {
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-size-select:hover {
+    border-color: #007bff;
 }
 
 .page-btn {
